@@ -5,14 +5,14 @@
 <img src="https://img.shields.io/badge/Framework-Flask-green?style=for-the-badge" align="center">  
 </p>
 
----
+
 
 ## **About Dagu**  
 **Dagu** is a next-generation secure chat platform inspired by the Ethiopian *Dagu* (trusted word-of-mouth communication system). It provides a **quantum-inspired secure messaging system** where users can **register, login, and exchange encrypted messages** using a **web interface**.  
 
-> ⚠️ **Disclaimer:** This is a simplified **prototype** demonstrating secure messaging and quantum-inspired encryption. A full-scale system would include **cross-platform clients, real Quantum Key Distribution (QKD),** and advanced features.
+>  **Disclaimer:** This is a simplified **prototype** demonstrating secure messaging and quantum-inspired encryption. A full-scale system would include **cross-platform clients, real Quantum Key Distribution (QKD),** and advanced features.
 
----
+
 
 ## **Database Models**
 
@@ -21,7 +21,7 @@
 | **User**       | `id`, `username`, `email`, `password_hash`, `last_online` |
 | **Messages**   | `id`, `sender_id`, `receiver_id`, `message_text`, `timestamp` |
 
----
+
 
 ## **Features**  
 
@@ -30,7 +30,7 @@
 - **Web Interface:** Simple and responsive **UI** accessible on desktop and mobile browsers.  
 - **User Authentication:** Secure **registration, login, and logout** with hashed passwords.  
 
----
+
 
 ## **Tech Stack**  
 
@@ -39,9 +39,10 @@
 - **Database:** SQLite  
 - **Encryption Layer:** Quantum-inspired symmetric cryptography (Python)  
 
----
+
 
 ## **Team**  
 
 - **Paulos Berihun** – Backend Developer & Web Integration  
 - **Haileab Mulugeta** – Quantum Encryption & Security  
+
