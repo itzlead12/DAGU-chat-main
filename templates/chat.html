@@ -1,0 +1,15 @@
+<h2>Welcome {{ session.username }}</h2>
+<form method="POST">
+    Receiver Username: <input name="receiver"><br>
+    Message: <input name="message"><br>
+    <button type="submit">Send</button>
+</form>
+
+<h3>Messages:</h3>
+<ul>
+{% for msg in messages %}
+    <li><b>{{ msg.sender }}:</b> {{ msg.message_text }}</li>
+{% endfor %}
+</ul>
+
+<a href="/logout">Logout</a>
