@@ -1,12 +1,13 @@
-from flask import Flask, request, session, redirect, render_template, g
+from flask import Flask, request, session, redirect, render_template, g, make_response, flash
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_socketio import SocketIO, emit, join_room, leave_room
 from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
 DATABASE = 'chat_app.db'
-
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -78,6 +79,14 @@ def get_messages(user1_id, user2_id):
     """, (user1_id, user2_id, user2_id, user1_id))
     return cursor.fetchall()
 
+@app.after_request
+def add_header(response):
+    """Prevent browser caching of sensitive pages"""
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
 @app.route('/')
 def home():
     return redirect('/login')
@@ -91,9 +100,11 @@ def register():
 
         try:
             create_user(username, email, password)
-            return "User registered successfully!"
+            flash("User registered successfully! Please log in.", "success")
+            return redirect('/login')
         except sqlite3.IntegrityError:
-            return "Username or email already exists."
+            flash("Username or email already exists.", "error")
+            return redirect('/register')
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -108,14 +119,16 @@ def login():
             session['username'] = user['username']
             return redirect('/chat')
         else:
-            return "Invalid username or password."
+            flash(" Invalid username or password.", "error")
+            return redirect('/login')
     return render_template('login.html')
 
-    
 @app.route('/logout')
 def logout():
     session.clear()
-    return redirect('/login')
+    response = make_response(redirect('/login'))
+    response.delete_cookie("session")
+    return response
 
 @app.route('/chat', methods=['GET', 'POST'])
 def chat():
@@ -129,8 +142,7 @@ def chat():
         receiver_username = request.form['receiver']
         message = request.form['message']
 
-        encrypted_message = message  
-
+        encrypted_message = message 
         cursor.execute("SELECT id FROM users WHERE username=?", (receiver_username,))
         receiver = cursor.fetchone()
         if receiver:
@@ -149,7 +161,13 @@ def chat():
 
     return render_template('chat.html', messages=messages)
 
+@socketio.on('send_message')
+def handle_message(data):
+    sender = session.get('username')
+    message = data['message']
+    emit('receive_message', {'sender': sender, 'message': message}, broadcast=True)
+
 if __name__ == '__main__':
     with app.app_context():
-        init_db() 
-    app.run(debug=True, port=5050)
+        init_db()
+    socketio.run(app, debug=True, port=5050)
